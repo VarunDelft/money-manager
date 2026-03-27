@@ -4,7 +4,9 @@ A personal expense and income management platform. Money Manager helps users tra
 
 ## What's in this repository
 
-This project is in the **specification phase**. No application code has been written yet. The repository currently contains:
+This project is based on specification-driven development and makes use of the [Github spec-kit tool](https://github.com/github/spec-kit) integrated with Claude AI.
+
+Currently the project is in the **specification phase**. No application code has been written yet. The repository currently contains:
 
 - **Project constitution** — Core principles governing code quality, testing, UI/UX consistency, and accessibility standards for all future development.
 - **Feature specification** — A detailed spec for the Money Manager platform covering:
