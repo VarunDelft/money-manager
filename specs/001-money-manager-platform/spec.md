@@ -5,6 +5,17 @@
 **Status**: Draft  
 **Input**: User description: "Develop Money Manager, a personal expense & income manager platform with transaction logging, categories, recurring expenses, and statistics dashboard."
 
+## Clarifications
+
+### Session 2026-03-27
+
+- Q: When recurring transaction generation fails for a particular occurrence, what should happen? → A: Mark the occurrence as "missed", generate it on the next successful cycle, and show a notification to the user.
+- Q: What should the system do when a user enters a negative amount (e.g., "-50.00")? → A: Reject with a validation error: "Amount must be a positive number."
+- Q: If a user edits the same transaction in two browser tabs and saves conflicting changes, how should the system resolve the conflict? → A: Last-write-wins; the most recent save silently overwrites the previous save.
+- Q: When a user deletes a parent category that has subcategories, what happens to the subcategories? → A: Subcategories are also deleted; their transactions must also be reassigned alongside the parent's transactions.
+- Q: What is the maximum allowed length for the transaction title and short description fields? → A: Title: max 100 characters; Short description: max 250 characters.
+- Q: What should the priority order of the 5 user stories be? → A: Log → Edit/Delete → Categories → Statistics → Recurring.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Log an Expense or Income Entry (Priority: P1)
@@ -24,11 +35,27 @@ A user opens Money Manager and records a financial transaction that just occurre
 
 ---
 
-### User Story 2 - Manage Categories and Subcategories (Priority: P2)
+### User Story 2 - Edit and Delete Transactions (Priority: P2)
+
+A user realizes they made a mistake in a previously logged transaction or wants to remove an entry entirely. They can select any transaction from the list, edit its fields, and save the changes. They can also delete a transaction with a confirmation step.
+
+**Why this priority**: Immediately after creating their first transaction, users need to correct typos, fix amounts, or remove test entries. Data integrity depends on edit/delete being available early; all downstream features (categories, statistics, recurring) benefit from accurate data.
+
+**Independent Test**: Can be tested by creating a transaction, editing its amount and category, saving, and verifying the changes persist. Then deleting the entry and confirming it no longer appears.
+
+**Acceptance Scenarios**:
+
+1. **Given** the user views a transaction entry, **When** they tap/click edit, change the amount from 45.99 to 50.00, and save, **Then** the updated amount is reflected in the transaction list and any statistics.
+2. **Given** the user selects a transaction and chooses delete, **When** the confirmation dialog appears and they confirm, **Then** the transaction is permanently removed and no longer appears in any list or statistics.
+3. **Given** the user selects delete and the confirmation dialog appears, **When** they cancel, **Then** the transaction remains unchanged.
+
+---
+
+### User Story 3 - Manage Categories and Subcategories (Priority: P3)
 
 A user wants to organize their transactions under meaningful categories. The system provides a set of default categories (e.g., Groceries, Utilities, Shopping, Salary, Freelance). The user can also create custom categories, rename them, and nest subcategories under any category (e.g., "Utilities → Electricity", "Utilities → Water").
 
-**Why this priority**: Categories are essential for meaningful organization and directly support the statistics dashboard. Without them, transaction logging (P1) would lack structure.
+**Why this priority**: While default categories allow basic transaction logging from day one, custom categories and subcategories are needed for meaningful organization. This directly supports the statistics dashboard (P4) which groups data by category.
 
 **Independent Test**: Can be tested by viewing default categories, creating a new custom category, adding a subcategory under it, and then verifying both appear in the category picker when logging a transaction.
 
@@ -42,29 +69,11 @@ A user wants to organize their transactions under meaningful categories. The sys
 
 ---
 
-### User Story 3 - Configure Recurring Transactions (Priority: P3)
-
-A user has regular expenses (e.g., rent, streaming subscriptions) or income (e.g., salary) that repeat on a predictable schedule. They configure a recurring transaction by specifying the base transaction details and a recurrence rule (interval unit: day, week, month, or year; and frequency: e.g., every 1 month, every 2 weeks). The system automatically generates entries according to the schedule.
-
-**Why this priority**: Automating repeat entries saves significant manual effort and reduces the chance of forgotten transactions. It builds on P1 (transaction logging) and P2 (categories).
-
-**Independent Test**: Can be tested by creating a recurring expense set to repeat daily, advancing past the next occurrence, and verifying the system generated the expected entry automatically.
-
-**Acceptance Scenarios**:
-
-1. **Given** the user is on the "Add Recurring Transaction" screen, **When** they configure a monthly rent expense of 1200.00 USD starting 01/04/2026 with interval "every 1 month", **Then** the recurring rule is saved and visible in the recurring transactions list.
-2. **Given** a recurring transaction is configured for "every 2 weeks" starting 27/03/2026, **When** the next occurrence date (10/04/2026) arrives, **Then** the system creates a new transaction entry with the same details and the correct date.
-3. **Given** the user views the recurring transactions list, **When** they edit the amount of a recurring expense, **Then** future generated entries reflect the updated amount while previously generated entries remain unchanged.
-4. **Given** the user no longer needs a recurring transaction, **When** they deactivate or delete the recurring rule, **Then** no further entries are generated, but previously created entries are preserved.
-5. **Given** a recurring transaction with interval "every 1 month" starting on the 31st, **When** the next month has fewer than 31 days (e.g., February), **Then** the system generates the entry on the last day of that month.
-
----
-
 ### User Story 4 - View Financial Statistics Dashboard (Priority: P4)
 
 A user wants to understand their spending and earning patterns. They navigate to the statistics dashboard where they can view a summary of total income, total expenses, and net balance over a selected time period (day, week, month, or year). The dashboard shows breakdowns by category so the user can identify where money is going.
 
-**Why this priority**: Statistics provide the analytical value that transforms raw transaction data into actionable insights. It depends on P1 (transactions exist) and P2 (categories provide grouping).
+**Why this priority**: Statistics provide the analytical value that transforms raw transaction data into actionable insights. It depends on P1 (transactions exist), P2 (data is accurate), and P3 (categories provide grouping). Placed above recurring because users gain immediate value from seeing patterns in manually-entered data.
 
 **Independent Test**: Can be tested by logging several transactions across different categories and dates, then opening the statistics dashboard and verifying the totals and category breakdowns match the entered data.
 
@@ -78,30 +87,37 @@ A user wants to understand their spending and earning patterns. They navigate to
 
 ---
 
-### User Story 5 - Edit and Delete Transactions (Priority: P5)
+### User Story 5 - Configure Recurring Transactions (Priority: P5)
 
-A user realizes they made a mistake in a previously logged transaction or wants to remove an entry entirely. They can select any transaction from the list, edit its fields, and save the changes. They can also delete a transaction with a confirmation step.
+A user has regular expenses (e.g., rent, streaming subscriptions) or income (e.g., salary) that repeat on a predictable schedule. They configure a recurring transaction by specifying the base transaction details and a recurrence rule (interval unit: day, week, month, or year; and frequency: e.g., every 1 month, every 2 weeks). The system automatically generates entries according to the schedule.
 
-**Why this priority**: Correcting and removing entries is essential for data accuracy but is secondary to the ability to create entries in the first place.
+**Why this priority**: Automating repeat entries saves significant manual effort and reduces the chance of forgotten transactions. Placed last because it builds on all prior stories (P1 logging, P2 edit/delete for corrections, P3 categories for organization) and requires server-side scheduling infrastructure. Users can manually log recurring entries until this is available.
 
-**Independent Test**: Can be tested by creating a transaction, editing its amount and category, saving, and verifying the changes persist. Then deleting the entry and confirming it no longer appears.
+**Independent Test**: Can be tested by creating a recurring expense set to repeat daily, advancing past the next occurrence, and verifying the system generated the expected entry automatically.
 
 **Acceptance Scenarios**:
 
-1. **Given** the user views a transaction entry, **When** they tap/click edit, change the amount from 45.99 to 50.00, and save, **Then** the updated amount is reflected in the transaction list and any statistics.
-2. **Given** the user selects a transaction and chooses delete, **When** the confirmation dialog appears and they confirm, **Then** the transaction is permanently removed and no longer appears in any list or statistics.
-3. **Given** the user selects delete and the confirmation dialog appears, **When** they cancel, **Then** the transaction remains unchanged.
+1. **Given** the user is on the "Add Recurring Transaction" screen, **When** they configure a monthly rent expense of 1200.00 USD starting 01/04/2026 with interval "every 1 month", **Then** the recurring rule is saved and visible in the recurring transactions list.
+2. **Given** a recurring transaction is configured for "every 2 weeks" starting 27/03/2026, **When** the next occurrence date (10/04/2026) arrives, **Then** the system creates a new transaction entry with the same details and the correct date.
+3. **Given** the user views the recurring transactions list, **When** they edit the amount of a recurring expense, **Then** future generated entries reflect the updated amount while previously generated entries remain unchanged.
+4. **Given** the user no longer needs a recurring transaction, **When** they deactivate or delete the recurring rule, **Then** no further entries are generated, but previously created entries are preserved.
+5. **Given** a recurring transaction with interval "every 1 month" starting on the 31st, **When** the next month has fewer than 31 days (e.g., February), **Then** the system generates the entry on the last day of that month.
 
 ---
 
 ### Edge Cases
 
 - What happens when a user enters an amount of 0.00? The system MUST reject zero-amount transactions with a validation error.
+- What happens when a user enters a negative amount (e.g., "-50.00")? The system MUST reject it with the error "Amount must be a positive number." The transaction type (Expense/Income) captures directionality; negative amounts are never valid.
 - What happens when a user enters a date in the future? The system MUST allow future-dated entries (e.g., expected upcoming expenses) without error.
 - How does the system handle very large amounts (e.g., 999,999,999.99)? The system MUST support amounts up to at least 999,999,999.99 without overflow or display issues.
 - What happens when the user changes the currency of a recurring transaction? Future entries use the new currency; past entries retain the original currency.
 - How does the statistics dashboard handle transactions in multiple currencies? The dashboard MUST display amounts grouped by currency or show a note that multi-currency totals require a base currency selection.
 - What happens when all transactions in a category are deleted? The category remains available for future use; it is not auto-deleted.
+- What happens when the recurring transaction generation process fails for a scheduled occurrence? The system marks the occurrence as "missed", generates it on the next successful cycle, and notifies the user.
+- What happens when a user edits the same transaction in two browser tabs and saves conflicting changes? The system uses last-write-wins; the most recent save silently overwrites the previous one. This is acceptable for a single-user personal finance app.
+- What happens when a user deletes a parent category that has subcategories? All subcategories are also deleted. Transactions assigned to the parent or any of its subcategories must all be reassigned to a different category before the deletion proceeds.
+- What happens when a user exceeds the maximum field length (title > 100 chars, short description > 250 chars)? The system MUST prevent input beyond the limit and display a character count indicator.
 
 ## Requirements *(mandatory)*
 
@@ -110,11 +126,11 @@ A user realizes they made a mistake in a previously logged transaction or wants 
 **Transaction Management**
 
 - **FR-001**: System MUST allow users to create transaction entries of type "Expense" or "Income".
-- **FR-002**: Each transaction MUST have the following mandatory fields: title, date (dd/mm/yyyy format), short description, category, amount (up to 2 decimal places), and currency.
+- **FR-002**: Each transaction MUST have the following mandatory fields: title (max 100 characters), date (dd/mm/yyyy format), short description (max 250 characters), category, amount (up to 2 decimal places), and currency.
 - **FR-003**: Each transaction MAY optionally include: time (hh:mm format), detailed description, and one or more tags.
-- **FR-004**: System MUST validate that amount has no more than 2 decimal places and is greater than zero.
+- **FR-004**: System MUST validate that amount has no more than 2 decimal places, is greater than zero, and is a positive number. Negative values MUST be rejected with the error "Amount must be a positive number."
 - **FR-005**: System MUST persist all transaction data so it survives session restarts.
-- **FR-006**: Users MUST be able to edit any field of an existing transaction.
+- **FR-006**: Users MUST be able to edit any field of an existing transaction. Concurrent edits follow a last-write-wins strategy; the most recent save overwrites any prior save.
 - **FR-007**: Users MUST be able to delete a transaction, with a confirmation step before permanent removal.
 
 **Category Management**
@@ -122,14 +138,14 @@ A user realizes they made a mistake in a previously logged transaction or wants 
 - **FR-008**: System MUST provide a predefined set of default categories: Groceries, Utilities, Shopping, Transport, Entertainment, Health, Salary, Freelance, Investments, and Other.
 - **FR-009**: Users MUST be able to create custom categories with unique names (case-insensitive uniqueness enforced).
 - **FR-010**: Users MUST be able to create subcategories nested under any parent category (one level of nesting).
-- **FR-011**: Users MUST be able to rename and delete custom categories. Deleting a category with associated transactions MUST require reassignment first.
+- **FR-011**: Users MUST be able to rename and delete custom categories. Deleting a category with associated transactions MUST require reassignment first. Deleting a parent category MUST also delete all its subcategories; transactions assigned to those subcategories MUST also be included in the reassignment step.
 - **FR-012**: Default categories MUST NOT be deletable but MAY be hidden by the user.
 
 **Recurring Transactions**
 
 - **FR-013**: Users MUST be able to configure a recurring transaction by specifying a base transaction and a recurrence rule.
 - **FR-014**: A recurrence rule MUST define an interval unit (day, week, month, or year) and a frequency (e.g., every 1 month, every 2 weeks).
-- **FR-015**: The system MUST automatically generate transaction entries according to the configured schedule.
+- **FR-015**: The system MUST automatically generate transaction entries according to the configured schedule. If generation fails for a particular occurrence, the system MUST mark it as "missed", generate the entry on the next successful processing cycle, and display a notification to the user.
 - **FR-016**: Users MUST be able to edit, deactivate, or delete a recurring rule. Edits apply to future entries only; past generated entries remain unchanged.
 - **FR-017**: For monthly recurrences on dates that do not exist in shorter months (e.g., 31st in February), the system MUST use the last day of that month.
 
