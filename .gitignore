@@ -6,6 +6,7 @@ vendor/
 dist/
 build/
 out/
+*.tsbuildinfo
 
 # Environment files
 .env
@@ -15,6 +16,7 @@ out/
 # OS files
 .DS_Store
 Thumbs.db
+*.tmp
 
 # IDE files
 .idea/

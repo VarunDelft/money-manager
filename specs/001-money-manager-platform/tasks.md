@@ -18,9 +18,9 @@
 
 **Purpose**: Initialize both projects with TypeScript strict mode, linting, and testing frameworks
 
-- [ ] T001 [P] Initialize backend Node.js project with TypeScript 5.x strict mode, ESLint + typescript-eslint, Jest, Supertest in backend/package.json and backend/tsconfig.json
-- [ ] T002 [P] Initialize frontend React 18 project with TypeScript 5.x strict mode, ESLint, Jest, React Testing Library in frontend/package.json and frontend/tsconfig.json
-- [ ] T003 [P] Create AWS SAM template skeleton with Lambda, HTTP API v2, S3, RDS, RDS Proxy resource stubs in infra/template.yaml
+- [x] T001 [P] Initialize backend Node.js project with TypeScript 5.x strict mode, ESLint + typescript-eslint, Jest, Supertest in backend/package.json and backend/tsconfig.json
+- [x] T002 [P] Initialize frontend React 18 project with TypeScript 5.x strict mode, ESLint, Jest, React Testing Library in frontend/package.json and frontend/tsconfig.json
+- [x] T003 [P] Create AWS SAM template skeleton with Lambda, HTTP API v2, S3, RDS, RDS Proxy resource stubs in infra/template.yaml
 
 ---
 
@@ -32,32 +32,32 @@
 
 ### Database & Connection
 
-- [ ] T004 Configure PostgreSQL connection pool with RDS Proxy support, environment-based config, and retry logic in backend/src/db/pool.ts
-- [ ] T005 Set up node-pg-migrate configuration with migration scripts directory in backend/package.json
-- [ ] T006 [P] Create categories table migration with constraints, indexes, and default category seed data (Groceries, Utilities, Shopping, Transport, Entertainment, Health, Salary, Freelance, Investments, Other) in backend/src/db/migrations/001_create_categories.sql
-- [ ] T007 [P] Create tags table migration with case-insensitive unique index in backend/src/db/migrations/002_create_tags.sql
-- [ ] T008 [P] Create transactions table migration with all column constraints, FKs to categories, and indexes (recurring_rule_id column added without FK constraint) in backend/src/db/migrations/003_create_transactions.sql
-- [ ] T009 [P] Create transaction_tags join table migration with composite primary key in backend/src/db/migrations/004_create_transaction_tags.sql
-- [ ] T010 [P] Create recurring_rules table migration with constraints, indexes, and ALTER TABLE to add FK from transactions.recurring_rule_id in backend/src/db/migrations/005_create_recurring_rules.sql
-- [ ] T011 Create updated_at auto-trigger function migration applied to categories, transactions, tags, and recurring_rules in backend/src/db/migrations/006_add_updated_at_triggers.sql
+- [x] T004 Configure PostgreSQL connection pool with RDS Proxy support, environment-based config, and retry logic in backend/src/db/pool.ts
+- [x] T005 Set up node-pg-migrate configuration with migration scripts directory in backend/package.json
+- [x] T006 [P] Create categories table migration with constraints, indexes, and default category seed data (Groceries, Utilities, Shopping, Transport, Entertainment, Health, Salary, Freelance, Investments, Other) in backend/src/db/migrations/001_create_categories.sql
+- [x] T007 [P] Create tags table migration with case-insensitive unique index in backend/src/db/migrations/002_create_tags.sql
+- [x] T008 [P] Create transactions table migration with all column constraints, FKs to categories, and indexes (recurring_rule_id column added without FK constraint) in backend/src/db/migrations/003_create_transactions.sql
+- [x] T009 [P] Create transaction_tags join table migration with composite primary key in backend/src/db/migrations/004_create_transaction_tags.sql
+- [x] T010 [P] Create recurring_rules table migration with constraints, indexes, and ALTER TABLE to add FK from transactions.recurring_rule_id in backend/src/db/migrations/005_create_recurring_rules.sql
+- [x] T011 Create updated_at auto-trigger function migration applied to categories, transactions, tags, and recurring_rules in backend/src/db/migrations/006_add_updated_at_triggers.sql
 
 ### Backend Application Shell
 
-- [ ] T012 Define TypeScript interfaces for all entities (Transaction, Category, Tag, RecurringRule) and shared API response/error types in backend/src/models/
-- [ ] T013 Create Express app factory with JSON body parsing, CORS configured for S3 website origin, and route mounting in backend/src/api/index.ts
-- [ ] T014 [P] Create request validation middleware with field-level inline error responses matching contracts error format in backend/src/api/middleware/validation.ts
-- [ ] T015 [P] Create standardized error handling middleware mapping errors to contract error codes (VALIDATION_ERROR, NOT_FOUND, CONFLICT, INTERNAL_ERROR) in backend/src/api/middleware/errorHandler.ts
-- [ ] T016 [P] Create Lambda handler entry point wrapping Express app with @codegenie/serverless-express in backend/src/lambda.ts
-- [ ] T017 Implement read-only CategoryService.getAll returning nested tree structure with subcategories in backend/src/services/categoryService.ts
-- [ ] T018 Implement GET /categories route with includeHidden query parameter for category picker in backend/src/api/routes/categories.ts
+- [x] T012 Define TypeScript interfaces for all entities (Transaction, Category, Tag, RecurringRule) and shared API response/error types in backend/src/models/
+- [x] T013 Create Express app factory with JSON body parsing, CORS configured for S3 website origin, and route mounting in backend/src/api/index.ts
+- [x] T014 [P] Create request validation middleware with field-level inline error responses matching contracts error format in backend/src/api/middleware/validation.ts
+- [x] T015 [P] Create standardized error handling middleware mapping errors to contract error codes (VALIDATION_ERROR, NOT_FOUND, CONFLICT, INTERNAL_ERROR) in backend/src/api/middleware/errorHandler.ts
+- [x] T016 [P] Create Lambda handler entry point wrapping Express app with @codegenie/serverless-express in backend/src/lambda.ts
+- [x] T017 Implement read-only CategoryService.getAll returning nested tree structure with subcategories in backend/src/services/categoryService.ts
+- [x] T018 Implement GET /categories route with includeHidden query parameter for category picker in backend/src/api/routes/categories.ts
 
 ### Frontend Application Shell
 
-- [ ] T019 [P] Build shared UI component library (Button, Input, Select, TextArea, Modal, Toast, FormField, LoadingSpinner) following design system consistency rules in frontend/src/components/ui/
-- [ ] T020 [P] Set up React Router with route definitions and page stub components for all 5 screens in frontend/src/App.tsx
-- [ ] T021 [P] Create typed API client base with fetch wrapper, error parsing, and REACT_APP_API_URL config in frontend/src/services/api.ts
-- [ ] T022 [P] Define frontend TypeScript types mirroring all API response contracts in frontend/src/types/
-- [ ] T023 [P] Create useFormValidation hook for inline validation on blur + submit per FR-024 in frontend/src/hooks/useFormValidation.ts
+- [x] T019 [P] Build shared UI component library (Button, Input, Select, TextArea, Modal, Toast, FormField, LoadingSpinner) following design system consistency rules in frontend/src/components/ui/
+- [x] T020 [P] Set up React Router with route definitions and page stub components for all 5 screens in frontend/src/App.tsx
+- [x] T021 [P] Create typed API client base with fetch wrapper, error parsing, and REACT_APP_API_URL config in frontend/src/services/api.ts
+- [x] T022 [P] Define frontend TypeScript types mirroring all API response contracts in frontend/src/types/
+- [x] T023 [P] Create useFormValidation hook for inline validation on blur + submit per FR-024 in frontend/src/hooks/useFormValidation.ts
 
 **Checkpoint**: Foundation ready — database migrated with seeded categories, Express app running with middleware, frontend shell rendering with routing. User story implementation can begin.
 
@@ -73,24 +73,24 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation (Red-Green-Refactor)**
 
-- [ ] T024 [P] [US1] Write unit tests for TransactionService.create covering amount validation, mandatory field checks, tag upsert, and persistence in backend/tests/unit/services/transactionService.test.ts
-- [ ] T025 [P] [US1] Write unit tests for TransactionService.getAll covering cursor pagination, filtering by type/category/date range/search in backend/tests/unit/services/transactionService.test.ts
-- [ ] T026 [P] [US1] Write integration tests for POST /transactions (success, validation errors, invalid category) and GET /transactions (list, filters, pagination) in backend/tests/integration/transactions.test.ts
-- [ ] T027 [P] [US1] Write unit tests for TransactionForm component covering inline validation on blur, submit with empty fields, optional field toggling in frontend/tests/unit/components/TransactionForm.test.tsx
-- [ ] T028 [P] [US1] Write unit tests for TransactionList component covering rendering items, empty state, pagination controls in frontend/tests/unit/components/TransactionList.test.tsx
+- [x] T024 [P] [US1] Write unit tests for TransactionService.create covering amount validation, mandatory field checks, tag upsert, and persistence in backend/tests/unit/services/transactionService.test.ts
+- [x] T025 [P] [US1] Write unit tests for TransactionService.getAll covering cursor pagination, filtering by type/category/date range/search in backend/tests/unit/services/transactionService.test.ts
+- [x] T026 [P] [US1] Write integration tests for POST /transactions (success, validation errors, invalid category) and GET /transactions (list, filters, pagination) in backend/tests/integration/transactions.test.ts
+- [x] T027 [P] [US1] Write unit tests for TransactionForm component covering inline validation on blur, submit with empty fields, optional field toggling in frontend/tests/unit/components/TransactionForm.test.tsx
+- [x] T028 [P] [US1] Write unit tests for TransactionList component covering rendering items, empty state, pagination controls in frontend/tests/unit/components/TransactionList.test.tsx
 
 ### Implementation for US1
 
-- [ ] T029 [US1] Implement TransactionService.create with amount/decimal validation, mandatory field checks, and tag find-or-create logic in backend/src/services/transactionService.ts
-- [ ] T030 [US1] Implement TransactionService.getAll with cursor-based pagination, filtering by type/categoryId/dateFrom/dateTo/search in backend/src/services/transactionService.ts
-- [ ] T031 [US1] Implement TransactionService.getById returning full transaction with joined category name and tags in backend/src/services/transactionService.ts
-- [ ] T032 [US1] Implement POST /transactions route with request validation wiring to TransactionService.create in backend/src/api/routes/transactions.ts
-- [ ] T033 [US1] Implement GET /transactions and GET /transactions/:id routes with query parameter parsing in backend/src/api/routes/transactions.ts
-- [ ] T034 [US1] Implement GET /tags route for tag autocomplete support in backend/src/api/routes/tags.ts
-- [ ] T035 [P] [US1] Build TransactionForm component with type selector, mandatory fields (title, date, amount, currency, category picker, short description), optional fields (time, detailed description, tags), and inline validation in frontend/src/components/transactions/TransactionForm.tsx
-- [ ] T036 [P] [US1] Build TransactionList component with date-sorted entries, amount/currency display, category badges, and pagination controls in frontend/src/components/transactions/TransactionList.tsx
-- [ ] T037 [US1] Build AddTransactionPage wiring TransactionForm to POST /transactions API with success toast and redirect to list in frontend/src/pages/AddTransactionPage.tsx
-- [ ] T038 [US1] Build TransactionListPage wiring TransactionList component to GET /transactions API with filter controls in frontend/src/pages/TransactionListPage.tsx
+- [x] T029 [US1] Implement TransactionService.create with amount/decimal validation, mandatory field checks, and tag find-or-create logic in backend/src/services/transactionService.ts
+- [x] T030 [US1] Implement TransactionService.getAll with cursor-based pagination, filtering by type/categoryId/dateFrom/dateTo/search in backend/src/services/transactionService.ts
+- [x] T031 [US1] Implement TransactionService.getById returning full transaction with joined category name and tags in backend/src/services/transactionService.ts
+- [x] T032 [US1] Implement POST /transactions route with request validation wiring to TransactionService.create in backend/src/api/routes/transactions.ts
+- [x] T033 [US1] Implement GET /transactions and GET /transactions/:id routes with query parameter parsing in backend/src/api/routes/transactions.ts
+- [x] T034 [US1] Implement GET /tags route for tag autocomplete support in backend/src/api/routes/tags.ts
+- [x] T035 [P] [US1] Build TransactionForm component with type selector, mandatory fields (title, date, amount, currency, category picker, short description), optional fields (time, detailed description, tags), and inline validation in frontend/src/components/transactions/TransactionForm.tsx
+- [x] T036 [P] [US1] Build TransactionList component with date-sorted entries, amount/currency display, category badges, and pagination controls in frontend/src/components/transactions/TransactionList.tsx
+- [x] T037 [US1] Build AddTransactionPage wiring TransactionForm to POST /transactions API with success toast and redirect to list in frontend/src/pages/AddTransactionPage.tsx
+- [x] T038 [US1] Build TransactionListPage wiring TransactionList component to GET /transactions API with filter controls in frontend/src/pages/TransactionListPage.tsx
 
 **Checkpoint**: US1 MVP complete — users can log expenses and incomes and view them in a paginated list with filters.
 
@@ -104,18 +104,18 @@
 
 ### Tests for US2
 
-- [ ] T039 [P] [US2] Write unit tests for TransactionService.update (partial field update, last-write-wins, validation) and TransactionService.delete (permanent removal) in backend/tests/unit/services/transactionService.test.ts
-- [ ] T040 [P] [US2] Write integration tests for PUT /transactions/:id (success, validation, not found) and DELETE /transactions/:id (success, not found) in backend/tests/integration/transactions.test.ts
-- [ ] T041 [P] [US2] Write unit tests for EditTransactionPage (loads existing data, submits changes, handles errors) and delete confirmation flow in frontend/tests/unit/pages/EditTransactionPage.test.tsx
+- [x] T039 [P] [US2] Write unit tests for TransactionService.update (partial field update, last-write-wins, validation) and TransactionService.delete (permanent removal) in backend/tests/unit/services/transactionService.test.ts
+- [x] T040 [P] [US2] Write integration tests for PUT /transactions/:id (success, validation, not found) and DELETE /transactions/:id (success, not found) in backend/tests/integration/transactions.test.ts
+- [x] T041 [P] [US2] Write unit tests for EditTransactionPage (loads existing data, submits changes, handles errors) and delete confirmation flow in frontend/tests/unit/pages/EditTransactionPage.test.tsx
 
 ### Implementation for US2
 
-- [ ] T042 [US2] Implement TransactionService.update with partial field updates, last-write-wins semantics, and validation in backend/src/services/transactionService.ts
-- [ ] T043 [US2] Implement TransactionService.delete with permanent removal in backend/src/services/transactionService.ts
-- [ ] T044 [US2] Implement PUT /transactions/:id and DELETE /transactions/:id routes with request validation in backend/src/api/routes/transactions.ts
-- [ ] T045 [US2] Build EditTransactionPage reusing TransactionForm pre-populated via GET /transactions/:id with save wired to PUT in frontend/src/pages/EditTransactionPage.tsx
-- [ ] T046 [US2] Add edit navigation link and delete button with confirmation Modal to TransactionList items in frontend/src/components/transactions/TransactionList.tsx
-- [ ] T047 [US2] Wire edit link and delete action in TransactionListPage to navigate to EditTransactionPage and call DELETE API respectively in frontend/src/pages/TransactionListPage.tsx
+- [x] T042 [US2] Implement TransactionService.update with partial field updates, last-write-wins semantics, and validation in backend/src/services/transactionService.ts
+- [x] T043 [US2] Implement TransactionService.delete with permanent removal in backend/src/services/transactionService.ts
+- [x] T044 [US2] Implement PUT /transactions/:id and DELETE /transactions/:id routes with request validation in backend/src/api/routes/transactions.ts
+- [x] T045 [US2] Build EditTransactionPage reusing TransactionForm pre-populated via GET /transactions/:id with save wired to PUT in frontend/src/pages/EditTransactionPage.tsx
+- [x] T046 [US2] Add edit navigation link and delete button with confirmation Modal to TransactionList items in frontend/src/components/transactions/TransactionList.tsx
+- [x] T047 [US2] Wire edit link and delete action in TransactionListPage to navigate to EditTransactionPage and call DELETE API respectively in frontend/src/pages/TransactionListPage.tsx
 
 **Checkpoint**: US1 + US2 complete — full transaction CRUD operational with confirmation dialogs.
 
@@ -129,17 +129,17 @@
 
 ### Tests for US3
 
-- [ ] T048 [P] [US3] Write unit tests for CategoryService CRUD (create with case-insensitive uniqueness, rename with conflict detection, delete with reassignment + subcategory cascade, toggle visibility) in backend/tests/unit/services/categoryService.test.ts
-- [ ] T049 [P] [US3] Write integration tests for POST /categories, PUT /categories/:id, PATCH /categories/:id/visibility, DELETE /categories/:id (with and without reassignment) in backend/tests/integration/categories.test.ts
-- [ ] T050 [P] [US3] Write unit tests for ManageCategoriesPage (render tree, create form, rename inline, delete with reassignment dialog, subcategory nesting) in frontend/tests/unit/pages/ManageCategoriesPage.test.tsx
+- [x] T048 [P] [US3] Write unit tests for CategoryService CRUD (create with case-insensitive uniqueness, rename with conflict detection, delete with reassignment + subcategory cascade, toggle visibility) in backend/tests/unit/services/categoryService.test.ts
+- [x] T049 [P] [US3] Write integration tests for POST /categories, PUT /categories/:id, PATCH /categories/:id/visibility, DELETE /categories/:id (with and without reassignment) in backend/tests/integration/categories.test.ts
+- [x] T050 [P] [US3] Write unit tests for ManageCategoriesPage (render tree, create form, rename inline, delete with reassignment dialog, subcategory nesting) in frontend/tests/unit/pages/ManageCategoriesPage.test.tsx
 
 ### Implementation for US3
 
-- [ ] T051 [US3] Implement CategoryService.create with case-insensitive uniqueness validation and one-level nesting enforcement in backend/src/services/categoryService.ts
-- [ ] T052 [US3] Implement CategoryService.rename with case-insensitive conflict detection in backend/src/services/categoryService.ts
-- [ ] T053 [US3] Implement CategoryService.delete with transaction count check, reassignment of transactions from parent and subcategories, and cascading subcategory deletion in backend/src/services/categoryService.ts
-- [ ] T054 [US3] Implement CategoryService.toggleVisibility for hiding/showing default categories (reject non-default) in backend/src/services/categoryService.ts
-- [ ] T055 [US3] Implement POST /categories, PUT /categories/:id, PATCH /categories/:id/visibility, DELETE /categories/:id routes in backend/src/api/routes/categories.ts
+- [x] T051 [US3] Implement CategoryService.create with case-insensitive uniqueness validation and one-level nesting enforcement in backend/src/services/categoryService.ts
+- [x] T052 [US3] Implement CategoryService.rename with case-insensitive conflict detection in backend/src/services/categoryService.ts
+- [x] T053 [US3] Implement CategoryService.delete with transaction count check, reassignment of transactions from parent and subcategories, and cascading subcategory deletion in backend/src/services/categoryService.ts
+- [x] T054 [US3] Implement CategoryService.toggleVisibility for hiding/showing default categories (reject non-default) in backend/src/services/categoryService.ts
+- [x] T055 [US3] Implement POST /categories, PUT /categories/:id, PATCH /categories/:id/visibility, DELETE /categories/:id routes in backend/src/api/routes/categories.ts
 - [ ] T056 [P] [US3] Build CategoryForm component for create/rename with inline name validation and parent selector in frontend/src/components/categories/CategoryForm.tsx
 - [ ] T057 [P] [US3] Build CategoryTree component displaying nested categories with edit/delete/hide action buttons in frontend/src/components/categories/CategoryTree.tsx
 - [ ] T058 [US3] Build ReassignCategoryModal component for selecting target category when deleting a category with transactions in frontend/src/components/categories/ReassignCategoryModal.tsx

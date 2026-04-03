@@ -1,0 +1,281 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Money Manager Platform - Serverless Backend
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 1024
+    Runtime: nodejs20.x
+    Environment:
+      Variables:
+        NODE_ENV: production
+
+Parameters:
+  Stage:
+    Type: String
+    Default: prod
+    AllowedValues: [dev, staging, prod]
+  DBName:
+    Type: String
+    Default: expense_manager
+  DBUser:
+    Type: String
+    Default: expense_mgr
+  DBPassword:
+    Type: String
+    NoEcho: true
+  FrontendBucketName:
+    Type: String
+    Default: money-manager-frontend
+
+Resources:
+  # --- S3: Frontend Static Website Hosting ---
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${FrontendBucketName}-${Stage}'
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      VersioningConfiguration:
+        Status: Enabled
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Sub '${FrontendBucket.Arn}/*'
+
+  # --- API Gateway: HTTP API v2 ---
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref Stage
+      CorsConfiguration:
+        AllowOrigins:
+          - !GetAtt FrontendBucket.WebsiteURL
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        MaxAge: 3600
+
+  # --- Lambda: API Handler ---
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/lambda.handler
+      CodeUri: backend/
+      Description: Money Manager Express API
+      Events:
+        ApiRoute:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref HttpApi
+            Path: /api/{proxy+}
+            Method: ANY
+      Environment:
+        Variables:
+          DATABASE_URL: !Sub 'postgresql://${DBUser}:${DBPassword}@${RDSProxy.Endpoint}:5432/${DBName}'
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+
+  # --- Lambda: Database Migration ---
+  MigrationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/migrate.handler
+      CodeUri: backend/
+      Timeout: 300
+      Description: Database migration runner
+      Environment:
+        Variables:
+          DATABASE_URL: !Sub 'postgresql://${DBUser}:${DBPassword}@${RDSProxy.Endpoint}:5432/${DBName}'
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+
+  # --- Lambda: Recurring Transaction Generator ---
+  RecurringGeneratorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/jobs/recurringHandler.handler
+      CodeUri: backend/
+      Timeout: 60
+      Description: Daily recurring transaction generator
+      Events:
+        DailySchedule:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: 'cron(0 2 * * ? *)'
+            Description: Generate recurring transactions daily at 02:00 UTC
+      Environment:
+        Variables:
+          DATABASE_URL: !Sub 'postgresql://${DBUser}:${DBPassword}@${RDSProxy.Endpoint}:5432/${DBName}'
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+
+  # --- RDS: PostgreSQL ---
+  # NOTE: VPC, Subnets, and Security Groups are stubs - expand for production
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Sub 'money-manager-${Stage}'
+      DBName: !Ref DBName
+      Engine: postgres
+      EngineVersion: '16'
+      DBInstanceClass: db.t4g.micro
+      AllocatedStorage: 20
+      MasterUsername: !Ref DBUser
+      MasterUserPassword: !Ref DBPassword
+      PubliclyAccessible: false
+      VPCSecurityGroups:
+        - !Ref DBSecurityGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
+
+  # --- RDS Proxy ---
+  RDSProxy:
+    Type: AWS::RDS::DBProxy
+    Properties:
+      DBProxyName: !Sub 'money-manager-proxy-${Stage}'
+      EngineFamily: POSTGRESQL
+      RequireTLS: true
+      RoleArn: !GetAtt RDSProxyRole.Arn
+      Auth:
+        - AuthScheme: SECRETS
+          SecretArn: !Ref DBSecret
+          IAMAuth: DISABLED
+      VpcSecurityGroupIds:
+        - !Ref DBSecurityGroup
+      VpcSubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+
+  RDSProxyTargetGroup:
+    Type: AWS::RDS::DBProxyTargetGroup
+    Properties:
+      DBProxyName: !Ref RDSProxy
+      TargetGroupName: default
+      DBInstanceIdentifiers:
+        - !Ref RDSInstance
+      ConnectionPoolConfigurationInfo:
+        MaxConnectionsPercent: 100
+        MaxIdleConnectionsPercent: 50
+
+  # --- Stub resources (expand for production) ---
+  # VPC, Subnets, Security Groups, IAM Roles, Secrets Manager
+  # These are placeholders - define based on actual AWS account setup
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.1.0/24'
+      AvailabilityZone: !Select [0, !GetAZs '']
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: '10.0.2.0/24'
+      AvailabilityZone: !Select [1, !GetAZs '']
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: '10.0.0.0/16'
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Lambda functions
+      VpcId: !Ref VPC
+
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for RDS
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref LambdaSecurityGroup
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnets for RDS
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+
+  DBSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub 'money-manager-db-${Stage}'
+      SecretString: !Sub '{"username":"${DBUser}","password":"${DBPassword}"}'
+
+  RDSProxyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: rds.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: RDSProxySecretsAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'secretsmanager:GetSecretValue'
+                Resource: !Ref DBSecret
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}'
+  FrontendUrl:
+    Description: Frontend S3 website URL
+    Value: !GetAtt FrontendBucket.WebsiteURL
+  RDSEndpoint:
+    Description: RDS instance endpoint
+    Value: !GetAtt RDSInstance.Endpoint.Address
+  RDSProxyEndpoint:
+    Description: RDS Proxy endpoint
+    Value: !GetAtt RDSProxy.Endpoint
