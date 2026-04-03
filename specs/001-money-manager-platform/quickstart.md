@@ -117,7 +117,7 @@ expense-manager/
 
 | Component | Technology | Notes |
 |-----------|-----------|-------|
-| Frontend | React 18 + TypeScript | SPA, deployed to S3 + CloudFront |
+| Frontend | React 18 + TypeScript | SPA, deployed to S3 static website hosting |
 | Backend | Express 4 + TypeScript | Wrapped with `@codegenie/serverless-express` for Lambda |
 | Database | PostgreSQL 16 | RDS in production, local Docker for dev |
 | Migrations | node-pg-migrate | SQL-first, run via CI/CD pipeline |
@@ -137,4 +137,4 @@ cd frontend && npm run build
 cd infra && sam build && sam deploy --guided
 ```
 
-Production deployment pipeline: Lint → Type Check → Test → Build → Migrate DB → Deploy Lambda → Deploy Frontend to S3 → Invalidate CloudFront cache.
+Production deployment pipeline: Lint → Type Check → Test → Build → Migrate DB → Deploy Lambda → Deploy Frontend to S3.

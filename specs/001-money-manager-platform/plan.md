@@ -13,7 +13,7 @@ Money Manager is a personal expense & income management platform with transactio
 **Primary Dependencies**: React 18 (frontend), Express 4.x (backend), `aws-serverless-express` or `@codegenie/serverless-express` (Lambda adapter), `pg` / `node-postgres` (database driver), `node-cron` or EventBridge Scheduler (recurring transactions)
 **Storage**: PostgreSQL 16 on AWS RDS
 **Testing**: Jest + React Testing Library (frontend), Jest + Supertest (backend), integration tests against test PostgreSQL
-**Target Platform**: AWS — S3 (static frontend), API Gateway + Lambda (backend), RDS PostgreSQL (database)
+**Target Platform**: AWS — S3 static website hosting (frontend), API Gateway + Lambda (backend), RDS PostgreSQL (database)
 **Project Type**: Web application (SPA frontend + serverless REST API backend)
 **Performance Goals**: API responses < 200ms at p95 under normal load; dashboard loads within 2 seconds for up to 10,000 transactions; Lighthouse performance score ≥ 90 for frontend
 **Constraints**: Lambda cold start budget < 3s; RDS connection pooling required (Lambda concurrency); single-user per account; no offline support in v1

@@ -61,21 +61,23 @@
 
 ## 4. React SPA on S3 + API Gateway
 
-**Decision**: Host the React build output on S3, fronted by CloudFront with Origin Access Identity (OAI). Use API Gateway HTTP API (v2) to proxy requests to the Express Lambda.
+**Decision**: Host the React build output on S3 using S3 static website hosting (no CloudFront). Use API Gateway HTTP API (v2) to proxy requests to the Express Lambda.
 
-**Rationale**: S3 + CloudFront is the standard, cost-effective, scalable approach for SPAs. HTTP API v2 is ~70% cheaper than REST API v1, has lower latency, and natively supports Lambda proxy integration. OAI ensures S3 is not publicly accessible — all traffic goes through CloudFront.
+**Rationale**: S3 static website hosting serves the SPA directly at minimal cost, avoiding CloudFront charges. For a single-user personal finance app, CDN edge caching provides negligible benefit. HTTP API v2 is ~70% cheaper than REST API v1, has lower latency, and natively supports Lambda proxy integration.
 
 **Alternatives considered**:
-- AWS Amplify Hosting — simpler DX but less control over CloudFront behavior and ~20% costlier
+- S3 + CloudFront — standard approach but adds unnecessary cost for a single-user app with no global distribution needs
+- AWS Amplify Hosting — simpler DX but adds cost; bundles CloudFront internally
 - REST API (v1) instead of HTTP API (v2) — legacy, higher latency, higher cost
-- Direct Lambda URLs — no CDN/caching; slower for repeat requests
+- Direct Lambda URLs — no caching; slower for repeat requests
 
 **Key configuration**:
-- S3: versioning enabled, public access blocked, bucket policy restricted to CloudFront OAI
-- CloudFront: `index.html` TTL 0 (always revalidate for app updates); hashed static assets TTL 1 year (immutable); gzip + HTTP/2 enabled
-- API Gateway CORS: allow origin = CloudFront domain; methods GET/POST/PUT/DELETE/PATCH; headers Content-Type + Authorization
+- S3: static website hosting enabled; bucket policy allows public read for website content; versioning enabled
+- S3 website endpoint: `http://{bucket}.s3-website-{region}.amazonaws.com`
+- S3 error document: set to `index.html` (SPA client-side routing — S3 serves index.html for all 404s)
+- API Gateway CORS: allow origin = S3 website endpoint URL; methods GET/POST/PUT/DELETE/PATCH; headers Content-Type + Authorization
 - React build: `REACT_APP_API_URL` set per environment via `.env.production` / `.env.staging`
-- CloudFront error page: 403/404 → `/index.html` with 200 status (SPA client-side routing)
+- Cache-Control headers set via S3 object metadata: `index.html` → `no-cache`; hashed assets → `max-age=31536000, immutable`
 
 ## 5. Database Migration Strategy
 
@@ -103,5 +105,5 @@
 | Express on Lambda | `@codegenie/serverless-express`, 1GB memory | Warm instance reuse, familiar Express DX |
 | DB Connections | RDS Proxy (transaction mode) + `pg` Pool (max 5) | Handles Lambda concurrency without connection exhaustion |
 | Recurring Txns | EventBridge Scheduler + PostgreSQL idempotency | AWS-native cron, no extra services, duplicate-safe |
-| Frontend Hosting | S3 + CloudFront (OAI) + HTTP API v2 | Cost-effective, cached, secure |
+| Frontend Hosting | S3 static website hosting + HTTP API v2 | Lowest cost, simple, no CDN overhead |
 | Migrations | `node-pg-migrate` + separate Lambda in CI/CD | SQL control, atomic, auditable |
