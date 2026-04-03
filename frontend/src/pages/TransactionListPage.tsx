@@ -41,8 +41,7 @@ const TransactionListPage: React.FC = () => {
 
   useEffect(() => {
     fetchTransactions(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
+  }, [filters]); // intentionally omitting fetchTransactions to avoid re-creating on cursor change
 
   const handleLoadMore = () => {
     fetchTransactions(true);

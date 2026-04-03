@@ -60,7 +60,7 @@ specs/
       rest-api.md    # REST API contracts
 ```
 
-## Getting Started
+## Getting Started (Local Setup)
 
 ### Prerequisites
 
@@ -70,7 +70,7 @@ specs/
 
 ### Setup
 
-```bash
+````bash
 # Install dependencies
 cd backend && npm install
 cd ../frontend && npm install
@@ -80,15 +80,22 @@ docker run --name money-pg -e POSTGRES_DB=money_manager \
   -e POSTGRES_USER=mm_user -e POSTGRES_PASSWORD=mm_pass \
   -p 5432:5432 -d postgres:16
 
+# Create environment file (if not already present) for backend database integration
+cd backend
+vi .env
+# Paste following content to .env
+DATABASE_URL=postgresql://mm_user:mm_pass@localhost:5432/money_manager
+
+
 # Run migrations
-cd backend && npm run migrate up
+npm run migrate:up
 
 # Start backend
 npm run dev
 
 # Start frontend (in another terminal)
 cd frontend && npm start
-```
+````
 
 ## Testing
 
