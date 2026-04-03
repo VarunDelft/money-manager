@@ -21,8 +21,8 @@ A personal expense and income management platform. Money Manager helps users tra
 
 | Component | Technology | Deployment |
 |-----------|-----------|------------|
-| Frontend | React 18 + TypeScript | S3 static website hosting |
-| Backend | Express 4 + TypeScript | AWS Lambda via API Gateway (HTTP API v2) |
+| Frontend | React 18 + TypeScript 4.9 | S3 static website hosting |
+| Backend | Express 5 + TypeScript 4.9 | AWS Lambda via API Gateway (HTTP API v2) |
 | Database | PostgreSQL 16 | AWS RDS with RDS Proxy |
 | Recurring Jobs | EventBridge Scheduler | Daily cron → Lambda |
 | Migrations | node-pg-migrate | Separate Lambda in CI/CD pipeline |
@@ -93,10 +93,10 @@ cd frontend && npm start
 ## Testing
 
 ```bash
-# Backend tests
+# Backend tests (60 tests across 4 suites)
 cd backend && npm test
 
-# Frontend tests
+# Frontend tests (19 tests across 4 suites)
 cd frontend && npm test
 ```
 

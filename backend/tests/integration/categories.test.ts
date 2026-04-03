@@ -113,17 +113,13 @@ describe('Category API Integration', () => {
 
   describe('DELETE /api/v1/categories/:id', () => {
     it('should delete a non-default category and return 204', async () => {
-      const mockClient = {
-        query: jest.fn()
-          .mockResolvedValueOnce({}) // BEGIN
-          .mockResolvedValueOnce({ rows: [{ id: 20, is_default: false, parent_id: null }] })
-          .mockResolvedValueOnce({ rows: [] }) // no subcategories
-          .mockResolvedValueOnce({}) // reassign transactions
-          .mockResolvedValueOnce({}) // delete
-          .mockResolvedValueOnce({}), // COMMIT
-        release: jest.fn(),
-      };
-      mockPool.connect = jest.fn().mockResolvedValue(mockClient);
+      mockPool.query = jest.fn()
+        .mockResolvedValueOnce({ rows: [{ id: 20, name: 'Subscriptions', parent_id: null, is_default: false, is_hidden: false, created_at: '2026-01-01', updated_at: '2026-01-01' }] }) // getById
+        .mockResolvedValueOnce({ rows: [] }) // find subcategories
+        .mockResolvedValueOnce({ rows: [{ count: '2' }] }) // transaction count
+        .mockResolvedValueOnce({ rows: [{ id: 1, name: 'Groceries', parent_id: null, is_default: true, is_hidden: false, created_at: '2026-01-01', updated_at: '2026-01-01' }] }) // getById(reassignTo)
+        .mockResolvedValueOnce({}) // UPDATE transactions
+        .mockResolvedValueOnce({}); // DELETE category
 
       await request(app)
         .delete('/api/v1/categories/20')
@@ -132,13 +128,8 @@ describe('Category API Integration', () => {
     });
 
     it('should return 400 when trying to delete a default category', async () => {
-      const mockClient = {
-        query: jest.fn()
-          .mockResolvedValueOnce({}) // BEGIN
-          .mockResolvedValueOnce({ rows: [{ id: 1, is_default: true }] }),
-        release: jest.fn(),
-      };
-      mockPool.connect = jest.fn().mockResolvedValue(mockClient);
+      mockPool.query = jest.fn()
+        .mockResolvedValueOnce({ rows: [{ id: 1, name: 'Groceries', parent_id: null, is_default: true, is_hidden: false, created_at: '2026-01-01', updated_at: '2026-01-01' }] }); // getById
 
       const res = await request(app)
         .delete('/api/v1/categories/1')

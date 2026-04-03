@@ -58,7 +58,7 @@ describe('TransactionService', () => {
       };
       pool.connect = jest.fn().mockResolvedValue(mockClient);
 
-      const result = await service.create(validInput);
+      const result = await transactionService.create(validInput);
 
       expect(result).toMatchObject({
         id: 1,
@@ -100,15 +100,15 @@ describe('TransactionService', () => {
             }],
           }) // INSERT
           .mockResolvedValueOnce({ rows: [{ id: 1, name: 'weekly' }] }) // tag upsert 1
+          .mockResolvedValueOnce({}) // transaction_tags insert 1
           .mockResolvedValueOnce({ rows: [{ id: 2, name: 'food' }] }) // tag upsert 2
-          .mockResolvedValueOnce({}) // transaction_tags insert
-          .mockResolvedValueOnce({}) // transaction_tags insert
+          .mockResolvedValueOnce({}) // transaction_tags insert 2
           .mockResolvedValueOnce({}), // COMMIT
         release: jest.fn(),
       };
       pool.connect = jest.fn().mockResolvedValue(mockClient);
 
-      const result = await service.create(input);
+      const result = await transactionService.create(input);
 
       expect(result.time).toBe('14:30');
       expect(result.detailedDescription).toBe('Bought fruits and vegetables');
@@ -117,43 +117,43 @@ describe('TransactionService', () => {
 
     it('should throw ValidationError for negative amount', async () => {
       await expect(
-        service.create({ ...validInput, amount: -10 })
+        transactionService.create({ ...validInput, amount: -10 })
       ).rejects.toThrow(ValidationError);
     });
 
     it('should throw ValidationError for zero amount', async () => {
       await expect(
-        service.create({ ...validInput, amount: 0 })
+        transactionService.create({ ...validInput, amount: 0 })
       ).rejects.toThrow(ValidationError);
     });
 
     it('should throw ValidationError for amount with more than 2 decimal places', async () => {
       await expect(
-        service.create({ ...validInput, amount: 10.999 })
+        transactionService.create({ ...validInput, amount: 10.999 })
       ).rejects.toThrow(ValidationError);
     });
 
     it('should throw ValidationError for amount exceeding max', async () => {
       await expect(
-        service.create({ ...validInput, amount: 1000000000 })
+        transactionService.create({ ...validInput, amount: 1000000000 })
       ).rejects.toThrow(ValidationError);
     });
 
     it('should throw ValidationError for missing mandatory fields', async () => {
       await expect(
-        service.create({ ...validInput, title: '' })
+        transactionService.create({ ...validInput, title: '' })
       ).rejects.toThrow(ValidationError);
     });
 
     it('should throw ValidationError for title exceeding max length', async () => {
       await expect(
-        service.create({ ...validInput, title: 'a'.repeat(101) })
+        transactionService.create({ ...validInput, title: 'a'.repeat(101) })
       ).rejects.toThrow(ValidationError);
     });
 
     it('should throw ValidationError for invalid type', async () => {
       await expect(
-        service.create({ ...validInput, type: 'invalid' as 'expense' })
+        transactionService.create({ ...validInput, type: 'invalid' as 'expense' })
       ).rejects.toThrow(ValidationError);
     });
 
@@ -167,7 +167,7 @@ describe('TransactionService', () => {
       pool.connect = jest.fn().mockResolvedValue(mockClient);
 
       await expect(
-        service.create({ ...validInput, categoryId: 999 })
+        transactionService.create({ ...validInput, categoryId: 999 })
       ).rejects.toThrow(NotFoundError);
     });
 
@@ -189,15 +189,15 @@ describe('TransactionService', () => {
             }],
           }) // INSERT transaction
           .mockResolvedValueOnce({ rows: [{ id: 10, name: 'existing-tag' }] }) // upsert tag 1
-          .mockResolvedValueOnce({ rows: [{ id: 11, name: 'new-tag' }] }) // upsert tag 2
           .mockResolvedValueOnce({}) // transaction_tags 1
+          .mockResolvedValueOnce({ rows: [{ id: 11, name: 'new-tag' }] }) // upsert tag 2
           .mockResolvedValueOnce({}) // transaction_tags 2
           .mockResolvedValueOnce({}), // COMMIT
         release: jest.fn(),
       };
       pool.connect = jest.fn().mockResolvedValue(mockClient);
 
-      const result = await service.create(input);
+      const result = await transactionService.create(input);
       expect(result.tags).toContain('existing-tag');
       expect(result.tags).toContain('new-tag');
     });
@@ -230,7 +230,7 @@ describe('TransactionService', () => {
         ],
       });
 
-      const result = await service.getAll({});
+      const result = await transactionService.getAll({});
 
       expect(result.data).toHaveLength(2);
       expect(result.pagination.hasMore).toBe(false);
@@ -240,7 +240,7 @@ describe('TransactionService', () => {
     it('should filter by type', async () => {
       pool.query = jest.fn().mockResolvedValue({ rows: [] });
 
-      await service.getAll({ type: 'income' });
+      await transactionService.getAll({ type: 'income' });
 
       const queryCall = (pool.query as jest.Mock).mock.calls[0];
       expect(queryCall[0]).toContain('type');
@@ -249,7 +249,7 @@ describe('TransactionService', () => {
     it('should filter by categoryId', async () => {
       pool.query = jest.fn().mockResolvedValue({ rows: [] });
 
-      await service.getAll({ categoryId: 5 });
+      await transactionService.getAll({ categoryId: 5 });
 
       const queryCall = (pool.query as jest.Mock).mock.calls[0];
       expect(queryCall[0]).toContain('category_id');
@@ -258,7 +258,7 @@ describe('TransactionService', () => {
     it('should filter by date range', async () => {
       pool.query = jest.fn().mockResolvedValue({ rows: [] });
 
-      await service.getAll({ dateFrom: '2026-01-01', dateTo: '2026-03-31' });
+      await transactionService.getAll({ dateFrom: '2026-01-01', dateTo: '2026-03-31' });
 
       const queryCall = (pool.query as jest.Mock).mock.calls[0];
       expect(queryCall[0]).toContain('date');
@@ -267,7 +267,7 @@ describe('TransactionService', () => {
     it('should filter by search term in title and shortDescription', async () => {
       pool.query = jest.fn().mockResolvedValue({ rows: [] });
 
-      await service.getAll({ search: 'groceries' });
+      await transactionService.getAll({ search: 'groceries' });
 
       const queryCall = (pool.query as jest.Mock).mock.calls[0];
       const queryStr = queryCall[0] as string;
@@ -288,7 +288,7 @@ describe('TransactionService', () => {
         })),
       });
 
-      const result = await service.getAll({ limit: 20 });
+      const result = await transactionService.getAll({ limit: 20 });
 
       expect(result.data).toHaveLength(20);
       expect(result.pagination.hasMore).toBe(true);
@@ -311,7 +311,7 @@ describe('TransactionService', () => {
         ],
       });
 
-      const result = await service.getAll({ limit: 20 });
+      const result = await transactionService.getAll({ limit: 20 });
 
       expect(result.data).toHaveLength(1);
       expect(result.pagination.hasMore).toBe(false);
@@ -335,7 +335,7 @@ describe('TransactionService', () => {
         }],
       });
 
-      const result = await service.getById(1);
+      const result = await transactionService.getById(1);
 
       expect(result).toMatchObject({
         id: 1,

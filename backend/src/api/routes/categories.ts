@@ -21,7 +21,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 
 router.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(req.params.id as string, 10);
     const { name } = req.body as { name: string };
     const category = await categoryService.rename(id, name);
     res.json({ data: category });
@@ -30,7 +30,7 @@ router.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
 
 router.patch('/:id/visibility', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(req.params.id as string, 10);
     const { isHidden } = req.body as { isHidden: boolean };
     const category = await categoryService.toggleVisibility(id, isHidden);
     res.json({ data: category });
@@ -39,8 +39,8 @@ router.patch('/:id/visibility', async (req: Request, res: Response, next: NextFu
 
 router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = parseInt(req.params.id, 10);
-    const { reassignToCategoryId } = req.body as { reassignToCategoryId?: number };
+    const id = parseInt(req.params.id as string, 10);
+    const reassignToCategoryId = (req.body as { reassignToCategoryId?: number } | undefined)?.reassignToCategoryId;
     await categoryService.remove(id, reassignToCategoryId);
     res.status(204).send();
   } catch (err) { next(err); }

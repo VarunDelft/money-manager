@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import * as categoryService from '../../../src/services/categoryService';
-import { ValidationError, NotFoundError, ConflictError } from '../../../src/models';
+import { ValidationError, ConflictError } from '../../../src/models';
 
 jest.mock('../../../src/db/pool', () => {
   const mockPool = {
@@ -70,10 +70,10 @@ describe('CategoryService', () => {
 
     it('should create a subcategory', async () => {
       mockPool.query = jest.fn()
-        .mockResolvedValueOnce({ rows: [] }) // uniqueness check
         .mockResolvedValueOnce({
           rows: [{ id: 1, parent_id: null }],
         }) // parent lookup (is top-level)
+        .mockResolvedValueOnce({ rows: [] }) // uniqueness check
         .mockResolvedValueOnce({
           rows: [{
             id: 21, name: 'Netflix', parent_id: 1,
@@ -98,7 +98,6 @@ describe('CategoryService', () => {
 
     it('should enforce one-level nesting (no sub-subcategories)', async () => {
       mockPool.query = jest.fn()
-        .mockResolvedValueOnce({ rows: [] }) // uniqueness check
         .mockResolvedValueOnce({
           rows: [{ id: 11, parent_id: 1 }], // parent is itself a subcategory
         });
@@ -174,31 +173,20 @@ describe('CategoryService', () => {
 
   describe('remove', () => {
     it('should delete a category and reassign transactions', async () => {
-      const mockClient = {
-        query: jest.fn()
-          .mockResolvedValueOnce({}) // BEGIN
-          .mockResolvedValueOnce({ rows: [{ id: 20, is_default: false, parent_id: null }] }) // get category
-          .mockResolvedValueOnce({ rows: [{ id: 21, parent_id: 20 }] }) // find subcategories
-          .mockResolvedValueOnce({}) // reassign transactions from subcategory
-          .mockResolvedValueOnce({}) // delete subcategory
-          .mockResolvedValueOnce({}) // reassign transactions from main category
-          .mockResolvedValueOnce({}) // delete category
-          .mockResolvedValueOnce({}), // COMMIT
-        release: jest.fn(),
-      };
-      mockPool.connect = jest.fn().mockResolvedValue(mockClient);
+      mockPool.query = jest.fn()
+        .mockResolvedValueOnce({ rows: [{ id: 20, name: 'Subscriptions', parent_id: null, is_default: false, is_hidden: false, created_at: '2026-01-01', updated_at: '2026-01-01' }] }) // getById
+        .mockResolvedValueOnce({ rows: [{ id: 21 }] }) // find subcategories
+        .mockResolvedValueOnce({ rows: [{ count: '3' }] }) // transaction count
+        .mockResolvedValueOnce({ rows: [{ id: 1, name: 'Groceries', parent_id: null, is_default: true, is_hidden: false, created_at: '2026-01-01', updated_at: '2026-01-01' }] }) // getById(reassignTo)
+        .mockResolvedValueOnce({}) // UPDATE transactions
+        .mockResolvedValueOnce({}); // DELETE category
 
       await expect(categoryService.remove(20, 1)).resolves.toBeUndefined();
     });
 
     it('should reject deleting default categories', async () => {
-      const mockClient = {
-        query: jest.fn()
-          .mockResolvedValueOnce({}) // BEGIN
-          .mockResolvedValueOnce({ rows: [{ id: 1, is_default: true }] }), // category is default
-        release: jest.fn(),
-      };
-      mockPool.connect = jest.fn().mockResolvedValue(mockClient);
+      mockPool.query = jest.fn()
+        .mockResolvedValueOnce({ rows: [{ id: 1, name: 'Groceries', parent_id: null, is_default: true, is_hidden: false, created_at: '2026-01-01', updated_at: '2026-01-01' }] }); // getById
 
       await expect(
         categoryService.remove(1)

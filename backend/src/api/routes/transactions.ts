@@ -43,7 +43,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 // GET /api/v1/transactions/:id
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(req.params.id as string, 10);
     const transaction = await transactionService.getById(id);
     res.json({ data: transaction });
   } catch (err) { next(err); }
@@ -52,7 +52,7 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
 // PUT /api/v1/transactions/:id
 router.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(req.params.id as string, 10);
     const transaction = await transactionService.update(id, req.body);
     res.json({ data: transaction });
   } catch (err) { next(err); }
@@ -61,7 +61,7 @@ router.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
 // DELETE /api/v1/transactions/:id
 router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(req.params.id as string, 10);
     await transactionService.remove(id);
     res.status(204).send();
   } catch (err) { next(err); }
