@@ -51,7 +51,7 @@ const CategoryTreeItem: React.FC<{
               {category.isHidden && <span className="badge-hidden"> (hidden)</span>}
             </span>
             <div className="category-actions">
-              <Button size="sm" variant="ghost" onClick={() => setEditing(true)} aria-label={`Rename ${category.name}`}>
+              <Button size="sm" variant="ghost" onClick={() => setEditing(true)} aria-label={`Edit ${category.name}`}>
                 Rename
               </Button>
               {category.isDefault && (

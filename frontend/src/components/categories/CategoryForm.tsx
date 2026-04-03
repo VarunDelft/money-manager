@@ -17,7 +17,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ categories, onSubmit }) => 
     { value: '', label: 'None (top-level)' },
     ...categories
       .filter((c) => !c.parentId)
-      .map((c) => ({ value: String(c.id), label: c.name })),
+      .map((c) => ({ value: String(c.id), label: `Under: ${c.name}` })),
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {

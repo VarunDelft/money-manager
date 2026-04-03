@@ -140,10 +140,10 @@
 - [x] T053 [US3] Implement CategoryService.delete with transaction count check, reassignment of transactions from parent and subcategories, and cascading subcategory deletion in backend/src/services/categoryService.ts
 - [x] T054 [US3] Implement CategoryService.toggleVisibility for hiding/showing default categories (reject non-default) in backend/src/services/categoryService.ts
 - [x] T055 [US3] Implement POST /categories, PUT /categories/:id, PATCH /categories/:id/visibility, DELETE /categories/:id routes in backend/src/api/routes/categories.ts
-- [ ] T056 [P] [US3] Build CategoryForm component for create/rename with inline name validation and parent selector in frontend/src/components/categories/CategoryForm.tsx
-- [ ] T057 [P] [US3] Build CategoryTree component displaying nested categories with edit/delete/hide action buttons in frontend/src/components/categories/CategoryTree.tsx
-- [ ] T058 [US3] Build ReassignCategoryModal component for selecting target category when deleting a category with transactions in frontend/src/components/categories/ReassignCategoryModal.tsx
-- [ ] T059 [US3] Build ManageCategoriesPage assembling CategoryTree, CategoryForm, and ReassignCategoryModal wired to API in frontend/src/pages/ManageCategoriesPage.tsx
+- [x] T056 [P] [US3] Build CategoryForm component for create/rename with inline name validation and parent selector in frontend/src/components/categories/CategoryForm.tsx
+- [x] T057 [P] [US3] Build CategoryTree component displaying nested categories with edit/delete/hide action buttons in frontend/src/components/categories/CategoryTree.tsx
+- [x] T058 [US3] Build ReassignCategoryModal component for selecting target category when deleting a category with transactions in frontend/src/components/categories/ReassignCategoryModal.tsx
+- [x] T059 [US3] Build ManageCategoriesPage assembling CategoryTree, CategoryForm, and ReassignCategoryModal wired to API in frontend/src/pages/ManageCategoriesPage.tsx
 
 **Checkpoint**: US1–US3 complete — full transaction and category management operational.
 

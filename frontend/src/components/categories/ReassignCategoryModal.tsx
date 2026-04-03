@@ -49,7 +49,7 @@ const ReassignCategoryModal: React.FC<ReassignCategoryModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Reassign Transactions"
+      title="Delete Category"
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Cancel</Button>
@@ -59,16 +59,16 @@ const ReassignCategoryModal: React.FC<ReassignCategoryModalProps> = ({
             loading={submitting}
             disabled={!targetCategoryId}
           >
-            Delete & Reassign
+            Confirm Delete
           </Button>
         </>
       }
     >
       <p>
-        This category may have transactions. Select a category to reassign them to before deletion.
+        This category may have transactions. Please reassign them to another category before deletion.
       </p>
       <Select
-        label="Reassign to"
+        label="Target category"
         options={availableCategories}
         placeholder="Select target category"
         value={targetCategoryId}
